@@ -33,7 +33,7 @@ jobs:
       - name: Build Debug APK
         run: |
           cd android-app
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee ../gradle_output.txt
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee ../gradle_output.txt
 
       - name: Report Build Output
         if: always()

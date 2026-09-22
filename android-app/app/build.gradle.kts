@@ -39,12 +39,3 @@ android {
         }
     }
 }
-
-kotlin {
-    jvmToolchain(21)
-}
-
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-}
