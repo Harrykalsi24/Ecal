@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ecal • Smart EMI</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="mobile-viewport">
+        <!-- Persistent Fixed Header -->
+        <header class="mobile-header">
+            <div class="brand">
+                <img src="logo.png" alt="Ecal Logo" class="brand-logo-img">
+                <span class="brand-text">Ecal</span>
+            </div>
+
+            <!-- Segmented Theme Switcher -->
+            <div class="theme-pill-switch" role="radiogroup" aria-label="Theme selector">
+                <button type="button" class="theme-pill-btn" data-theme-val="system" title="System Theme">
+                    <span>💻</span>
+                </button>
+                <button type="button" class="theme-pill-btn" data-theme-val="light" title="Light Theme">
+                    <span>☀️</span>
+                </button>
+                <button type="button" class="theme-pill-btn active" data-theme-val="dark" title="Dark Theme">
+                    <span>🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Step / Page Indicator -->
+        <div class="stepper-nav">
+            <button type="button" class="step-tab active" id="tabInputs" onclick="goToSlide(0)">
+                <span class="step-num">1</span>
+                <span>Enter Details</span>
+            </button>
+            <div class="step-line" id="stepLine"></div>
+            <button type="button" class="step-tab" id="tabResults" onclick="goToSlide(1)">
+                <span class="step-num">2</span>
+                <span>View Results</span>
+            </button>
+        </div>
+
+        <form id="emiForm" autocomplete="off" onsubmit="return false;">
+            <!-- Hidden Radios for Category (Preserved for compatibility) -->
+            <input type="radio" name="field01" id="catMobile" value="1" checked style="display: none;">
+            <input type="radio" name="field01" id="catOther" value="2" style="display: none;">
+
+            <!-- 2-Page Swipe Viewport -->
+            <div class="slider-viewport" id="sliderViewport">
+                <div class="slider-track" id="sliderTrack">
+
+                    <!-- ==============================================
+                         PAGE 1: INPUT FIELDS
+                         ============================================== -->
+                    <section class="slider-page" id="pageInputs">
+                        <div class="page-inner">
+                            <div class="view-intro">
+                                <span class="section-kicker">STEP 1 OF 2</span>
+                                <h1 class="main-heading">Loan Details</h1>
+                                <p class="sub-text">Enter amounts below, then choose category to calculate</p>
+                            </div>
+
+                            <div class="inputs-container">
+                                <div class="mobile-input-card">
+                                    <div class="input-meta">
+                                        <label for="inp">Total Amount</label>
+                                        <span class="field-hint">Device / Product Price</span>
+                                    </div>
+                                    <div class="input-row">
+                                        <span class="input-prefix">₹</span>
+                                        <input type="number" id="inp" placeholder="0" min="0" step="any" inputmode="decimal">
+                                    </div>
+                                </div>
+
+                                <div class="mobile-input-card">
+                                    <div class="input-meta">
+                                        <label for="inp1">Given Amount</label>
+                                        <span class="field-hint">Down Payment</span>
+                                    </div>
+                                    <div class="input-row">
+                                        <span class="input-prefix">₹</span>
+                                        <input type="number" id="inp1" placeholder="0" min="0" step="any" inputmode="decimal">
+                                    </div>
+                                </div>
+
+                                <div class="mobile-input-card">
+                                    <div class="input-meta">
+                                        <label for="inp2">No. of Months</label>
+                                        <span class="field-hint">Tenure Period</span>
+                                    </div>
+                                    <div class="input-row">
+                                        <span class="input-prefix">⏱</span>
+                                        <input type="number" id="inp2" placeholder="0" min="1" step="1" inputmode="numeric">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fixed Category Action Buttons -->
+                            <div class="category-action-section">
+                                <div class="section-label">Select Loan Type & Calculate</div>
+                                <div class="category-buttons-grid">
+                                    <button type="button" class="btn-category-action" id="btnActionMobile" onclick="selectCategoryAndSlide('1')">
+                                        <div class="btn-cat-top">
+                                            <span class="btn-cat-icon">📱</span>
+                                            <span class="btn-cat-arrow">→</span>
+                                        </div>
+                                        <div class="btn-cat-title">Mobile</div>
+                                        <div class="btn-cat-sub">3% monthly interest</div>
+                                    </button>
+
+                                    <button type="button" class="btn-category-action" id="btnActionOther" onclick="selectCategoryAndSlide('2')">
+                                        <div class="btn-cat-top">
+                                            <span class="btn-cat-icon">🛍️</span>
+                                            <span class="btn-cat-arrow">→</span>
+                                        </div>
+                                        <div class="btn-cat-title">Other</div>
+                                        <div class="btn-cat-sub">2% + 18% GST</div>
+                                    </button>
+                                </div>
+                                <div class="swipe-hint">
+                                    <span>👉 Swipe left or tap category to view results</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==============================================
+                         PAGE 2: RESULTS BREAKDOWN
+                         ============================================== -->
+                    <section class="slider-page" id="pageResults">
+                        <div class="page-inner">
+                            <div class="results-header-bar">
+                                <button type="button" class="btn-back-link" onclick="goToSlide(0)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                                        <polyline points="12 19 5 12 12 5"></polyline>
+                                    </svg>
+                                    <span>Edit Details</span>
+                                </button>
+                                <div class="active-category-chip" id="activeCategoryChip">
+                                    <span>📱 Mobile</span>
+                                </div>
+                            </div>
+
+                            <!-- Hero Balance/EMI Bank Card -->
+                            <div class="hero-bank-card">
+                                <div class="card-bg-mountain" aria-hidden="true">
+                                    <svg viewBox="0 0 320 120" preserveAspectRatio="none">
+                                        <path d="M0 120 L0 80 Q60 65 110 90 T220 50 Q270 20 320 60 L320 120 Z" fill="rgba(255, 255, 255, 0.18)" />
+                                        <path d="M0 120 L0 95 Q80 70 140 100 T260 65 Q290 40 320 75 L320 120 Z" fill="rgba(255, 255, 255, 0.28)" />
+                                        <path d="M160 120 L210 55 L250 85 L285 45 L320 80 L320 120 Z" fill="rgba(255, 255, 255, 0.4)" />
+                                    </svg>
+                                </div>
+
+                                <div class="card-top-row">
+                                    <span class="card-chip-label">Monthly Installment</span>
+                                    <div class="card-status-dot"></div>
+                                </div>
+
+                                <div class="card-amount-wrap">
+                                    <span class="card-currency">₹</span>
+                                    <input type="text" id="inp6" class="hero-emi-input" value="0.00" readonly tabindex="-1">
+                                </div>
+
+                                <div class="card-footer-row">
+                                    <div class="card-sub-info">
+                                        <span class="sub-label">Total Payable</span>
+                                        <div class="sub-val-row">
+                                            <span>₹</span>
+                                            <input type="text" id="inp5" class="card-mini-input" value="0.00" readonly tabindex="-1">
+                                        </div>
+                                    </div>
+                                    <div class="card-brand-badge">E-PAY</div>
+                                </div>
+                            </div>
+
+                            <!-- Summary Breakdown List Card -->
+                            <div class="section-block">
+                                <div class="section-label">Breakdown Summary</div>
+                                <div class="summary-list-card">
+                                    <div class="summary-row">
+                                        <span class="row-label">Balance Loan (Principal)</span>
+                                        <div class="row-val">
+                                            <span>₹</span>
+                                            <input type="text" id="inp3" class="inline-output" value="0.00" readonly tabindex="-1">
+                                        </div>
+                                    </div>
+                                    <div class="summary-divider"></div>
+                                    <div class="summary-row">
+                                        <span class="row-label">Total Interest</span>
+                                        <div class="row-val">
+                                            <span>₹</span>
+                                            <input type="text" id="inp4" class="inline-output" value="0.00" readonly tabindex="-1">
+                                        </div>
+                                    </div>
+                                    <div class="summary-divider"></div>
+                                    <div class="summary-row">
+                                        <span class="row-label">File Charge (5% + ₹100)</span>
+                                        <div class="row-val">
+                                            <span>₹</span>
+                                            <input type="text" id="inp7" class="inline-output" value="0.00" readonly tabindex="-1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Switch category right from results -->
+                            <div class="results-toggle-row">
+                                <button type="button" class="btn-toggle-cat" id="btnToggleCat" onclick="toggleResultCategory()">
+                                    <span>Switch to <strong id="toggleTargetLabel">Other</strong></span>
+                                </button>
+                            </div>
+
+                            <!-- Actions Block -->
+                            <div class="actions-block">
+                                <button type="button" class="btn-clear" onclick="resetForm()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                        <path d="M3 3v5h5"></path>
+                                    </svg>
+                                    <span>Reset All</span>
+                                </button>
+                            </div>
+
+                            <div class="swipe-hint">
+                                <span>👈 Swipe right to adjust loan inputs</span>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
