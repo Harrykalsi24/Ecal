@@ -1,0 +1,8 @@
+{
+  "appId": "com.harrykalsi24.ecal",
+  "appName": "Ecal",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  }
+}
