@@ -1,3 +1,7 @@
 Ecal.apk
 
 .vscode/
+
+keystore.properties
+*.pem
+manifest_private_key.pem

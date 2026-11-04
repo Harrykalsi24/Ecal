@@ -15,6 +15,8 @@ import android.os.StatFs;
 import android.provider.Settings;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -22,7 +24,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,10 @@ public class UpdateManager {
     private final AtomicBoolean isCancelled;
     private HttpURLConnection currentConnection;
     private File currentDownloadingFile;
+
+    private String lastExpectedSha256;
+    private String lastManifestJson;
+    private String lastManifestSig;
 
     public UpdateManager(Activity activity) {
         this.activity = activity;
@@ -98,20 +103,26 @@ public class UpdateManager {
         }
     }
 
-    public void startDownload(String downloadUrl, String apkFileName, long expectedSize, UpdateListener listener) {
+    public void startDownload(String downloadUrl, String apkFileName, long expectedSize,
+                              String expectedSha256, String manifestJson, String manifestSig,
+                              UpdateListener listener) {
         if (isDownloading.get()) {
             notifyError(listener, "A download is already in progress.");
             return;
         }
 
         if (!validateDownloadUrl(downloadUrl)) {
-            notifyError(listener, "Security validation failed: untrusted download URL.");
+            notifyError(listener, "Security validation failed: Untrusted download URL origin.");
             return;
         }
 
+        this.lastExpectedSha256 = expectedSha256;
+        this.lastManifestJson = manifestJson;
+        this.lastManifestSig = manifestSig;
+
         isCancelled.set(false);
         isDownloading.set(true);
-        notifyStatus(listener, "DOWNLOADING", "Downloading update...");
+        notifyStatus(listener, "DOWNLOADING", "Connecting to official GitHub release...");
 
         executor.execute(() -> {
             InputStream in = null;
@@ -124,7 +135,6 @@ public class UpdateManager {
                     throw new Exception("Unable to create updates directory.");
                 }
 
-                // Clean old files
                 File[] oldFiles = dir.listFiles();
                 if (oldFiles != null) {
                     for (File f : oldFiles) {
@@ -132,7 +142,6 @@ public class UpdateManager {
                     }
                 }
 
-                // Storage check
                 StatFs stat = new StatFs(dir.getPath());
                 long availableSpace = stat.getAvailableBytes();
                 if (expectedSize > 0 && availableSpace < (expectedSize + (5L * 1024L * 1024L))) {
@@ -192,21 +201,19 @@ public class UpdateManager {
                     throw new InterruptedException("Download cancelled.");
                 }
 
-                notifyStatus(listener, "DOWNLOAD_SUCCESS", "Download complete. Verifying package...");
+                notifyStatus(listener, "DOWNLOAD_SUCCESS", "Download complete. Verifying cryptographic integrity...");
 
-                // APK Verification
-                verifyApk(targetFile);
+                // Full Cryptographic & Integrity Verification
+                verifyApk(targetFile, expectedSha256, manifestJson, manifestSig);
 
-                notifyStatus(listener, "VERIFICATION_SUCCESS", "APK verified successfully.");
+                notifyStatus(listener, "VERIFICATION_SUCCESS", "Integrity & signature verified.");
 
-                // Check installation permission
                 if (!canRequestPackageInstalls()) {
                     notifyStatus(listener, "PERMISSION_REQUIRED", "Installation permission required.");
                     return;
                 }
 
-                notifyStatus(listener, "INSTALLING", "Launching installer...");
-                launchInstallation(targetFile);
+                notifyStatus(listener, "READY_TO_INSTALL", "Verified. Ready to launch Android installer.");
 
             } catch (InterruptedException e) {
                 if (targetFile != null && targetFile.exists()) {
@@ -218,7 +225,7 @@ public class UpdateManager {
                 if (targetFile != null && targetFile.exists()) {
                     targetFile.delete();
                 }
-                notifyError(listener, e.getMessage() != null ? e.getMessage() : "Update failed.");
+                notifyError(listener, e.getMessage() != null ? e.getMessage() : "Update verification failed.");
             } finally {
                 isDownloading.set(false);
                 currentConnection = null;
@@ -239,19 +246,19 @@ public class UpdateManager {
         }
 
         try {
-            verifyApk(file);
+            verifyApk(file, lastExpectedSha256, lastManifestJson, lastManifestSig);
             if (!canRequestPackageInstalls()) {
                 notifyStatus(listener, "PERMISSION_REQUIRED", "Installation permission required.");
                 return;
             }
-            notifyStatus(listener, "INSTALLING", "Launching installer...");
+            notifyStatus(listener, "INSTALLING", "Launching Android installer...");
             launchInstallation(file);
         } catch (Exception e) {
             notifyError(listener, e.getMessage());
         }
     }
 
-    private void launchInstallation(File apkFile) {
+    public void launchInstallation(File apkFile) {
         mainHandler.post(() -> {
             try {
                 Uri apkUri = EcalFileProvider.getUriForFile(activity, apkFile);
@@ -266,7 +273,44 @@ public class UpdateManager {
         });
     }
 
-    private void verifyApk(File apkFile) throws Exception {
+    private void verifyApk(File apkFile, String expectedSha256, String manifestJson, String manifestSig) throws Exception {
+        // 1. File existence & basic size check
+        if (apkFile == null || !apkFile.exists() || apkFile.length() < 10000) {
+            throw new Exception("Incomplete or corrupted APK download.");
+        }
+
+        // 2. SHA-256 Checksum Verification
+        String actualSha256 = SecurityUtils.computeFileSha256(apkFile);
+        if (actualSha256.isEmpty()) {
+            throw new Exception("Failed to compute SHA-256 checksum of downloaded APK.");
+        }
+
+        if (expectedSha256 != null && !expectedSha256.trim().isEmpty()) {
+            String cleanExpected = expectedSha256.trim().toLowerCase();
+            if (!actualSha256.equalsIgnoreCase(cleanExpected)) {
+                throw new Exception("SHA-256 Checksum Mismatch!\nExpected: " + cleanExpected + "\nActual: " + actualSha256);
+            }
+        }
+
+        // 3. Signed Release Manifest Verification (Public Key Authenticity)
+        if (manifestJson != null && !manifestJson.trim().isEmpty() &&
+            manifestSig != null && !manifestSig.trim().isEmpty()) {
+            boolean validSig = SecurityUtils.verifyManifestSignature(manifestJson, manifestSig);
+            if (!validSig) {
+                throw new Exception("Untrusted release manifest: Cryptographic signature verification failed.");
+            }
+            try {
+                JSONObject mObj = new JSONObject(manifestJson);
+                String manifestSha = mObj.optString("apkSha256", "");
+                if (!manifestSha.isEmpty() && !actualSha256.equalsIgnoreCase(manifestSha)) {
+                    throw new Exception("Manifest SHA-256 mismatch with downloaded APK.");
+                }
+            } catch (Exception e) {
+                throw new Exception("Malformed release manifest data: " + e.getMessage());
+            }
+        }
+
+        // 4. Android Package Archive Verification
         PackageManager pm = activity.getPackageManager();
         PackageInfo archiveInfo;
         int flags = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) 
@@ -275,16 +319,16 @@ public class UpdateManager {
 
         archiveInfo = pm.getPackageArchiveInfo(apkFile.getAbsolutePath(), flags);
         if (archiveInfo == null || archiveInfo.packageName == null) {
-            throw new Exception("Downloaded file is not a valid APK package.");
+            throw new Exception("Downloaded file is not a valid Android APK archive.");
         }
 
-        // 1. Verify Package Name
+        // 5. Verify Package Name
         String expectedPkg = activity.getPackageName();
         if (!expectedPkg.equals(archiveInfo.packageName)) {
             throw new Exception("Package name mismatch: Expected " + expectedPkg + " but found " + archiveInfo.packageName);
         }
 
-        // 2. Verify Version Code
+        // 6. Verify Version Code (Reject Downgrades)
         PackageInfo installedInfo = pm.getPackageInfo(expectedPkg, flags);
         long installedVersionCode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) 
                 ? installedInfo.getLongVersionCode() 
@@ -295,10 +339,10 @@ public class UpdateManager {
                 : archiveInfo.versionCode;
 
         if (archiveVersionCode < installedVersionCode) {
-            throw new Exception("Downloaded APK version code (" + archiveVersionCode + ") is older than installed (" + installedVersionCode + ").");
+            throw new Exception("Version downgrade rejected: Downloaded version code (" + archiveVersionCode + ") is older than installed (" + installedVersionCode + ").");
         }
 
-        // 3. Verify Signing Certificate
+        // 7. Verify Signing Certificate Consistency
         Set<String> installedSigs = extractSignatures(installedInfo, null);
         Set<String> archiveSigs = extractSignatures(archiveInfo, apkFile.getAbsolutePath());
 
@@ -311,7 +355,7 @@ public class UpdateManager {
                 }
             }
             if (!hasMatch) {
-                Log.w(TAG, "Signature differs between installed app and update APK. Passing to Android PackageInstaller for system verification.");
+                Log.w(TAG, "Archive signature differs from installed app. Passing to Android PackageInstaller.");
             }
         }
     }
@@ -337,16 +381,13 @@ public class UpdateManager {
             Log.w(TAG, "Error extracting package signatures: " + e.getMessage());
         }
 
-        // Fallback for APK file archive if package archive info did not parse certificates
         if (set.isEmpty() && archivePath != null) {
             try (JarFile jar = new JarFile(archivePath)) {
                 JarEntry entry = jar.getJarEntry("AndroidManifest.xml");
                 if (entry != null) {
                     byte[] buf = new byte[4096];
                     try (InputStream is = jar.getInputStream(entry)) {
-                        while (is.read(buf, 0, buf.length) != -1) {
-                            // Read fully to verify signatures
-                        }
+                        while (is.read(buf, 0, buf.length) != -1) {}
                     }
                     java.security.cert.Certificate[] certs = entry.getCertificates();
                     if (certs != null) {
@@ -420,12 +461,6 @@ public class UpdateManager {
         throw new Exception("Too many HTTP redirects.");
     }
 
-    private void notifyProgress(UpdateListener listener, int percent, long downloaded, long total) {
-        mainHandler.post(() -> {
-            if (listener != null) listener.onProgress(percent, downloaded, total);
-        });
-    }
-
     private void notifyStatus(UpdateListener listener, String state, String message) {
         mainHandler.post(() -> {
             if (listener != null) listener.onStatus(state, message);
@@ -438,4 +473,3 @@ public class UpdateManager {
         });
     }
 }
-

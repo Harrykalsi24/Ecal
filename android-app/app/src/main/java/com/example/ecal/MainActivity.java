@@ -13,6 +13,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.File;
+
 public class MainActivity extends Activity {
     private WebView webView;
     private UpdateManager updateManager;
@@ -63,8 +65,15 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void startDownload(String downloadUrl, String apkFileName, long expectedSize) {
+            startDownloadWithSecurity(downloadUrl, apkFileName, expectedSize, null, null, null);
+        }
+
+        @JavascriptInterface
+        public void startDownloadWithSecurity(String downloadUrl, String apkFileName, long expectedSize,
+                                             String expectedSha256, String manifestJson, String manifestSig) {
             if (updateManager == null) return;
-            updateManager.startDownload(downloadUrl, apkFileName, expectedSize, new UpdateManager.UpdateListener() {
+            updateManager.startDownload(downloadUrl, apkFileName, expectedSize, expectedSha256, manifestJson, manifestSig,
+                    new UpdateManager.UpdateListener() {
                 @Override
                 public void onProgress(int percent, long downloadedBytes, long totalBytes) {
                     evalJs("if(window.onUpdateProgress) window.onUpdateProgress(" + percent + "," + downloadedBytes + "," + totalBytes + ");");
@@ -120,6 +129,28 @@ public class MainActivity extends Activity {
                     }
                 });
             }
+        }
+
+        @JavascriptInterface
+        public void launchInstallerDirectly(String apkFileName) {
+            if (updateManager != null) {
+                File dir = new File(getCacheDir(), "updates");
+                String safeName = (apkFileName != null && apkFileName.endsWith(".apk")) ? apkFileName : "update.apk";
+                File file = new File(dir, safeName);
+                if (file.exists()) {
+                    updateManager.launchInstallation(file);
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String getAppSecurityDetails() {
+            return SecurityUtils.getAppSecurityDetails(MainActivity.this).toString();
+        }
+
+        @JavascriptInterface
+        public String verifyAppIntegrity() {
+            return SecurityUtils.verifyInstalledIntegrity(MainActivity.this).toString();
         }
     }
 

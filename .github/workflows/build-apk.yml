@@ -31,10 +31,10 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > android-app/local.properties
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
 
-      - name: Build Debug APK
+      - name: Build Release APK
         run: |
           cd android-app
-          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee ../gradle_output.txt
+          ./gradlew :app:assembleRelease --no-daemon --stacktrace 2>&1 | tee ../gradle_output.txt
 
       - name: Report Build Output
         if: always()
@@ -46,10 +46,13 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Locate and Rename APK
+      - name: Locate and Rename Release APK
         run: |
-          echo "Searching for APK files..."
-          APK_PATH=$(find android-app -name "*.apk" | head -n 1)
+          echo "Searching for Release APK files..."
+          APK_PATH=$(find android-app -name "*release*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            APK_PATH=$(find android-app -name "*.apk" | head -n 1)
+          fi
           if [ -n "$APK_PATH" ]; then
             echo "Found APK at: $APK_PATH"
             cp "$APK_PATH" ./Ecal.apk
@@ -60,11 +63,47 @@ jobs:
             exit 1
           fi
 
-      - name: Upload APK Artifact
+      - name: Generate SHA-256 and Release Verification Assets
+        run: |
+          # 1. Generate SHA256 checksum
+          sha256sum ./Ecal.apk | awk '{print $1}' > ./Ecal.apk.sha256
+          SHA_VALUE=$(cat ./Ecal.apk.sha256)
+          echo "APK SHA-256: $SHA_VALUE"
+
+          # 2. Extract Version Info
+          VERSION_NAME=$(grep -oP 'versionName\s*=\s*"\K[^"]+' android-app/app/build.gradle.kts || echo "1.3.0")
+          VERSION_CODE=$(grep -oP 'versionCode\s*=\s*\K[0-9]+' android-app/app/build.gradle.kts || echo "5")
+
+          # 3. Create release manifest
+          cat <<EOF > ./release-manifest.json
+{
+  "packageName": "com.example.ecal",
+  "versionName": "$VERSION_NAME",
+  "versionCode": $VERSION_CODE,
+  "apkSha256": "$SHA_VALUE",
+  "publishedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+
+          # 4. Sign release manifest if private key secret is available
+          if [ -n "${{ secrets.MANIFEST_PRIVATE_KEY }}" ]; then
+            echo "Signing release manifest with secret MANIFEST_PRIVATE_KEY..."
+            echo "${{ secrets.MANIFEST_PRIVATE_KEY }}" > /tmp/manifest_key.pem
+            openssl dgst -sha256 -sign /tmp/manifest_key.pem -out /tmp/sig.bin ./release-manifest.json
+            base64 -w 0 /tmp/sig.bin > ./release-manifest.json.sig
+            rm -f /tmp/manifest_key.pem /tmp/sig.bin
+          fi
+
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Ecal-apk
-          path: ./Ecal.apk
+          name: Ecal-release-assets
+          if-no-files-found: ignore
+          path: |
+            ./Ecal.apk
+            ./Ecal.apk.sha256
+            ./release-manifest.json
+            ./release-manifest.json.sig
 
       - name: Determine Release Tag
         id: rel_tag
@@ -72,7 +111,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             TAG="${{ github.ref_name }}"
           else
-            VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' android-app/app/build.gradle.kts || echo "1.0")
+            VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' android-app/app/build.gradle.kts || echo "1.3.0")
             TAG="v${VERSION}"
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
@@ -84,8 +123,17 @@ jobs:
         with:
           tag_name: ${{ steps.rel_tag.outputs.tag }}
           name: ${{ steps.rel_tag.outputs.name }}
-          body: "Official Android APK release for Ecal Smart EMI."
-          files: ./Ecal.apk
+          body: |
+            ### Ecal Release ${{ steps.rel_tag.outputs.tag }}
+            - Release APK signed with official key
+            - SHA-256 integrity checksum included
+            - Release manifest and verification metadata
+          files: |
+            ./Ecal.apk
+            ./Ecal.apk.sha256
+            ./release-manifest.json
+            ./release-manifest.json.sig
+          fail_on_unmatched_files: false
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

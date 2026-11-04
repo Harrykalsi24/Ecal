@@ -1288,3 +1288,341 @@ input[type=number] {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ==========================================================================
+   Security & Verification Section & Policy Modals
+   ========================================================================== */
+.settings-update-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 10px;
+    height: 10px;
+    background: #38bdf8;
+    border-radius: 50%;
+    border: 2px solid var(--app-bg);
+    box-shadow: 0 0 8px #38bdf8;
+}
+
+.update-security-badge-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.sec-badge-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.security-card {
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sec-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sec-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-all;
+}
+
+.sec-value.mono-val {
+    font-family: monospace;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    background: var(--app-bg);
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+.sec-link {
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.sec-link:hover {
+    text-decoration: underline;
+}
+
+.btn-verify-integrity {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--app-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 14px;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.825rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-top: 4px;
+}
+
+.btn-verify-integrity:hover {
+    border-color: var(--color-accent-blue);
+    background: var(--surface-card-hover);
+}
+
+.btn-verify-integrity:active {
+    transform: scale(0.98);
+}
+
+.integrity-result-box {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.integrity-status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.integrity-status-pill.verified {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.integrity-status-pill.failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.integrity-status-pill.unavailable {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.integrity-status-desc {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+    text-align: center;
+}
+
+.btn-open-policy {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-open-policy:hover {
+    background: var(--surface-card-hover);
+    border-color: var(--color-accent-blue);
+}
+
+/* Pre-Installation & Policy Modals */
+.pre-install-backdrop,
+.policy-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+.pre-install-dialog {
+    background: var(--app-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 22px 20px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+}
+
+.pre-install-icon {
+    font-size: 2.2rem;
+}
+
+.pre-install-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.pre-install-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.pre-install-notice-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 10px 12px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notice-point {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+
+.notice-point strong {
+    color: var(--text-primary);
+}
+
+.pre-install-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-confirm-install {
+    flex: 1;
+    padding: 11px;
+    background: var(--color-accent-blue);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-cancel-install {
+    padding: 11px 16px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.policy-sheet {
+    background: var(--app-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 20px;
+    max-width: 380px;
+    max-height: 80vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.policy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 10px;
+}
+
+.policy-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.btn-close-policy {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.policy-body {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+}
+
+.policy-body h4 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--color-accent-blue);
+}
+
+.policy-body p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.policy-body a {
+    color: var(--color-accent-blue);
+}

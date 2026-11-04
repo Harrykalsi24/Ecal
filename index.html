@@ -21,12 +21,13 @@
                 <span class="brand-text">Ecal</span>
             </div>
 
-            <!-- Settings Menu Trigger (Top Right) -->
+            <!-- Settings Menu Trigger (Top Right) with update notification badge -->
             <button type="button" class="btn-settings-trigger" id="btnSettingsTrigger" aria-label="Settings" title="Settings">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                 </svg>
+                <span class="settings-update-badge hidden" id="settingsUpdateBadge" title="New update available"></span>
             </button>
         </header>
 
@@ -44,7 +45,6 @@
         </div>
 
         <form id="emiForm" autocomplete="off" onsubmit="return false;">
-            <!-- Hidden Radios for Category (Preserved for compatibility) -->
             <input type="radio" name="field01" id="catMobile" value="1" checked style="display: none;">
             <input type="radio" name="field01" id="catOther" value="2" style="display: none;">
 
@@ -52,9 +52,7 @@
             <div class="slider-viewport" id="sliderViewport">
                 <div class="slider-track" id="sliderTrack">
 
-                    <!-- ==============================================
-                         PAGE 1: INPUT FIELDS
-                         ============================================== -->
+                    <!-- PAGE 1: INPUT FIELDS -->
                     <section class="slider-page" id="pageInputs">
                         <div class="page-inner">
                             <div class="view-intro">
@@ -98,7 +96,6 @@
                                 </div>
                             </div>
 
-                            <!-- Fixed Category Action Buttons -->
                             <div class="category-action-section">
                                 <div class="section-label">Select Loan Type & Calculate</div>
                                 <div class="category-buttons-grid">
@@ -127,9 +124,7 @@
                         </div>
                     </section>
 
-                    <!-- ==============================================
-                         PAGE 2: RESULTS BREAKDOWN
-                         ============================================== -->
+                    <!-- PAGE 2: RESULTS BREAKDOWN -->
                     <section class="slider-page" id="pageResults">
                         <div class="page-inner">
                             <div class="results-header-bar">
@@ -145,7 +140,7 @@
                                 </div>
                             </div>
 
-                            <!-- Hero Balance/EMI Bank Card -->
+                            <!-- Hero Card -->
                             <div class="hero-bank-card">
                                 <div class="card-bg-mountain" aria-hidden="true">
                                     <svg viewBox="0 0 320 120" preserveAspectRatio="none">
@@ -177,7 +172,7 @@
                                 </div>
                             </div>
 
-                            <!-- Summary Breakdown List Card -->
+                            <!-- Summary Breakdown Card -->
                             <div class="section-block">
                                 <div class="section-label">Breakdown Summary</div>
                                 <div class="summary-list-card">
@@ -215,14 +210,12 @@
                                 </div>
                             </div>
 
-                            <!-- Switch category right from results -->
                             <div class="results-toggle-row">
                                 <button type="button" class="btn-toggle-cat" id="btnToggleCat" onclick="toggleResultCategory()">
                                     <span>Switch to <strong id="toggleTargetLabel">Other</strong></span>
                                 </button>
                             </div>
 
-                            <!-- Actions Block -->
                             <div class="actions-block">
                                 <button type="button" class="btn-clear" onclick="resetForm()">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +236,7 @@
             </div>
         </form>
 
-        <!-- Settings Modal / Drawer (Top Right Menu) -->
+        <!-- Settings Modal / Drawer -->
         <div class="settings-modal-backdrop" id="settingsModalBackdrop" aria-hidden="true">
             <div class="settings-sheet" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
                 <div class="settings-handle" aria-hidden="true"></div>
@@ -251,7 +244,7 @@
                 <div class="settings-header">
                     <div class="settings-title-wrap">
                         <h2 class="settings-title" id="settingsTitle">Settings</h2>
-                        <span class="settings-sub">Preferences & Updates</span>
+                        <span class="settings-sub">Preferences, Security & Updates</span>
                     </div>
                     <button type="button" class="btn-close-settings" id="btnCloseSettings" aria-label="Close Settings">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -280,14 +273,14 @@
 
                     <!-- Application Updates Section -->
                     <div class="settings-section">
-                        <div class="section-label">App Version & Updates</div>
+                        <div class="section-label">App Updates</div>
                         <div class="update-card" id="updateCard">
                             <div class="update-version-row">
                                 <div class="app-version-meta">
                                     <span class="app-meta-title">Ecal Smart EMI</span>
-                                    <span class="app-meta-version" id="appInstalledVersion">v1.2.1</span>
+                                    <span class="app-meta-version" id="appInstalledVersion">v1.3.0</span>
                                 </div>
-                                <span class="update-channel-badge">Official Release</span>
+                                <span class="update-channel-badge">GitHub Release</span>
                             </div>
 
                             <button type="button" class="btn-check-update" id="btnCheckUpdate">
@@ -298,7 +291,7 @@
                             </button>
 
                             <div class="update-status-msg" id="updateStatusMsg">
-                                Tap button above to check GitHub for updates.
+                                Auto-checking GitHub for official releases...
                             </div>
 
                             <!-- Expandable Update Details Container -->
@@ -306,7 +299,7 @@
                                 <div class="update-meta-grid">
                                     <div class="meta-item">
                                         <span class="meta-label">Latest Version</span>
-                                        <span class="meta-val" id="updateLatestTag">v1.1.0</span>
+                                        <span class="meta-val" id="updateLatestTag">-</span>
                                     </div>
                                     <div class="meta-item">
                                         <span class="meta-label">Published</span>
@@ -318,12 +311,17 @@
                                     </div>
                                 </div>
 
+                                <div class="update-security-badge-row">
+                                    <span class="sec-badge-pill" id="badgeSha256">🔒 SHA-256 Checksum</span>
+                                    <span class="sec-badge-pill" id="badgeManifest">🛡️ Signed Manifest</span>
+                                </div>
+
                                 <div class="update-notes-block">
                                     <div class="notes-header">Release Notes</div>
                                     <div class="notes-content" id="updateChangelog"></div>
                                 </div>
 
-                                <!-- Progress Bar (Active during download) -->
+                                <!-- Progress Bar -->
                                 <div class="download-progress-wrap hidden" id="downloadProgressWrap">
                                     <div class="progress-info-row">
                                         <span class="progress-status-label" id="downloadStatusLabel">Downloading...</span>
@@ -362,6 +360,129 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- App Security & Verification Section -->
+                    <div class="settings-section">
+                        <div class="section-label">App Security & Verification</div>
+                        <div class="security-card" id="securityCard">
+                            <div class="sec-item">
+                                <span class="sec-label">Application Name</span>
+                                <span class="sec-value">Ecal</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Package Name</span>
+                                <span class="sec-value" id="secPackageName">com.example.ecal</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Installed Version</span>
+                                <span class="sec-value" id="secVersion">1.3.0 (Code 5)</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Distribution Channel</span>
+                                <span class="sec-value">Official GitHub Release</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Official Repository</span>
+                                <a href="https://github.com/Harrykalsi24/Ecal" target="_blank" rel="noopener noreferrer" class="sec-link">
+                                    Harrykalsi24/Ecal ↗
+                                </a>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Installation Source</span>
+                                <span class="sec-value" id="secInstallSource">Direct APK (GitHub)</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Signing Certificate (SHA-256)</span>
+                                <span class="sec-value mono-val" id="secCertFingerprint">Loading...</span>
+                            </div>
+                            <div class="sec-item">
+                                <span class="sec-label">Current APK Checksum</span>
+                                <span class="sec-value mono-val" id="secApkSha256">Computing...</span>
+                            </div>
+
+                            <button type="button" class="btn-verify-integrity" id="btnVerifyIntegrity">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                <span>Verify App Integrity</span>
+                            </button>
+
+                            <div class="integrity-result-box hidden" id="integrityResultBox">
+                                <div class="integrity-status-pill" id="integrityStatusPill">App integrity verified</div>
+                                <div class="integrity-status-desc" id="integrityStatusDesc"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy & Distribution Policy Section -->
+                    <div class="settings-section">
+                        <div class="section-label">Trust & Policy</div>
+                        <button type="button" class="btn-open-policy" id="btnOpenPolicy">
+                            <span>📜 Privacy & Distribution Policy</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pre-Installation Informational Modal -->
+        <div class="pre-install-backdrop hidden" id="preInstallBackdrop" aria-hidden="true">
+            <div class="pre-install-dialog" role="dialog" aria-labelledby="preInstallTitle">
+                <div class="pre-install-icon">🛡️</div>
+                <h3 class="pre-install-title" id="preInstallTitle">Android System Installation</h3>
+                <p class="pre-install-desc">
+                    Ecal is distributed directly via <strong>GitHub Releases</strong> outside Google Play.
+                </p>
+                <div class="pre-install-notice-card">
+                    <div class="notice-point">
+                        <strong>Official PackageInstaller:</strong> Android will display its official confirmation prompt asking for your approval.
+                    </div>
+                    <div class="notice-point">
+                        <strong>Google Play Protect:</strong> Android may scan this update for safety before installing. Ecal never attempts to bypass or disable security scans.
+                    </div>
+                    <div class="notice-point">
+                        <strong>Cryptographically Verified:</strong> This APK's SHA-256 checksum and package signature match the installed app.
+                    </div>
+                </div>
+                <div class="pre-install-actions">
+                    <button type="button" class="btn-confirm-install" id="btnConfirmInstall">
+                        Continue to Install
+                    </button>
+                    <button type="button" class="btn-cancel-install" id="btnCancelInstall">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy & Security Policy Modal -->
+        <div class="policy-modal-backdrop hidden" id="policyModalBackdrop" aria-hidden="true">
+            <div class="policy-sheet" role="dialog" aria-labelledby="policyTitle">
+                <div class="policy-header">
+                    <h3 class="policy-title" id="policyTitle">Privacy & Distribution Policy</h3>
+                    <button type="button" class="btn-close-policy" id="btnClosePolicy">✕</button>
+                </div>
+                <div class="policy-body">
+                    <h4>1. 100% Offline & Private</h4>
+                    <p>
+                        Ecal is designed with privacy by default. All loan, EMI, interest, and down payment calculations run 100% locally on your device. No financial data, inputs, or personal information are ever collected, stored, or transmitted to any server.
+                    </p>
+
+                    <h4>2. Direct Open-Source Distribution</h4>
+                    <p>
+                        Ecal is distributed directly through its official GitHub repository (<a href="https://github.com/Harrykalsi24/Ecal" target="_blank">Harrykalsi24/Ecal</a>) outside Google Play. Because of direct distribution, Android requires your one-time permission to install updates.
+                    </p>
+
+                    <h4>3. Cryptographic Verification & Security</h4>
+                    <p>
+                        Every update published on GitHub includes SHA-256 checksums and a cryptographically signed manifest. Ecal verifies that downloaded APK packages originate exclusively from the official repository and match the installed application's signing certificate before launching the Android installer.
+                    </p>
+
+                    <h4>4. Google Play Protect Respect</h4>
+                    <p>
+                        Ecal does not attempt to circumvent, disable, or modify Google Play Protect or any Android security settings. Google Play Protect may inspect updates to protect your device.
+                    </p>
                 </div>
             </div>
         </div>
