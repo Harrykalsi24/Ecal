@@ -77,15 +77,7 @@ jobs:
           VERSION_CODE=$(grep -oP 'versionCode\s*=\s*\K[0-9]+' android-app/app/build.gradle.kts || echo "5")
 
           # 3. Create release manifest
-          cat <<EOF > ./release-manifest.json
-{
-  "packageName": "com.example.ecal",
-  "versionName": "$VERSION_NAME",
-  "versionCode": $VERSION_CODE,
-  "apkSha256": "$SHA_VALUE",
-  "publishedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-}
-EOF
+          python3 -c "import json, datetime; json.dump({'packageName':'com.example.ecal','versionName':'$VERSION_NAME','versionCode':int('$VERSION_CODE'),'apkSha256':'$SHA_VALUE','publishedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}, open('release-manifest.json','w'), indent=2)"
 
           # 4. Sign release manifest if private key secret is available
           if [ -n "$MANIFEST_KEY" ]; then
