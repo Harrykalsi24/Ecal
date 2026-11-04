@@ -64,6 +64,8 @@ jobs:
           fi
 
       - name: Generate SHA-256 and Release Verification Assets
+        env:
+          MANIFEST_KEY: ${{ secrets.MANIFEST_PRIVATE_KEY }}
         run: |
           # 1. Generate SHA256 checksum
           sha256sum ./Ecal.apk | awk '{print $1}' > ./Ecal.apk.sha256
@@ -86,9 +88,9 @@ jobs:
 EOF
 
           # 4. Sign release manifest if private key secret is available
-          if [ -n "${{ secrets.MANIFEST_PRIVATE_KEY }}" ]; then
+          if [ -n "$MANIFEST_KEY" ]; then
             echo "Signing release manifest with secret MANIFEST_PRIVATE_KEY..."
-            echo "${{ secrets.MANIFEST_PRIVATE_KEY }}" > /tmp/manifest_key.pem
+            printf "%s\n" "$MANIFEST_KEY" > /tmp/manifest_key.pem
             openssl dgst -sha256 -sign /tmp/manifest_key.pem -out /tmp/sig.bin ./release-manifest.json
             base64 -w 0 /tmp/sig.bin > ./release-manifest.json.sig
             rm -f /tmp/manifest_key.pem /tmp/sig.bin
