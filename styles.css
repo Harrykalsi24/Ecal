@@ -814,3 +814,477 @@ input[type=number] {
 .btn-clear:active {
     transform: scale(0.98);
 }
+
+/* ==========================================================================
+   No. of Months Result Suffix
+   ========================================================================== */
+.val-suffix {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-left: 0.15rem;
+}
+
+/* ==========================================================================
+   Settings Menu Trigger & Bottom Sheet Modal
+   ========================================================================== */
+.btn-settings-trigger {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-settings-trigger:hover {
+    background: var(--surface-card-hover);
+    border-color: var(--color-accent-blue);
+    transform: rotate(30deg);
+}
+
+.btn-settings-trigger:active {
+    transform: scale(0.92);
+}
+
+.settings-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+}
+
+.settings-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-sheet {
+    width: 100%;
+    max-width: 414px;
+    max-height: 88vh;
+    background: var(--app-bg);
+    border: 1px solid var(--border-subtle);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+    padding: 12px 20px 24px;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.settings-modal-backdrop.open .settings-sheet {
+    transform: translateY(0);
+}
+
+.settings-handle {
+    width: 42px;
+    height: 4px;
+    background: var(--border-subtle);
+    border-radius: 9999px;
+    margin: 4px auto 14px;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.settings-title-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.settings-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.btn-close-settings {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-close-settings:hover {
+    background: var(--surface-card-hover);
+    color: var(--text-primary);
+}
+
+.btn-close-settings:active {
+    transform: scale(0.92);
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theme-menu-switch {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px;
+    gap: 4px;
+}
+
+.theme-menu-switch .theme-pill-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   Application Updates Card & Details
+   ========================================================================== */
+.update-card {
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.update-version-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-version-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.app-meta-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.app-meta-version {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-accent-blue);
+}
+
+.update-channel-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(113, 152, 219, 0.15);
+    color: var(--color-accent-blue);
+}
+
+.btn-check-update {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    background: var(--color-accent-blue);
+    border: none;
+    border-radius: 14px;
+    color: #FFFFFF;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(113, 152, 219, 0.35);
+    transition: all var(--transition);
+}
+
+.btn-check-update:hover {
+    background: var(--color-accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(113, 152, 219, 0.45);
+}
+
+.btn-check-update:active {
+    transform: scale(0.98);
+}
+
+.btn-check-update:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.update-status-msg {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    text-align: center;
+    padding: 2px 4px;
+}
+
+.update-details-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 12px;
+}
+
+.update-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: var(--app-bg);
+    border: 1px solid var(--border-subtle);
+    padding: 10px;
+    border-radius: 14px;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.meta-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.meta-val {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.update-notes-block {
+    background: var(--app-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 10px 12px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.notes-header {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-kicker);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.notes-content {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.download-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--app-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+.progress-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--surface-card);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #7198DB, #567ec6);
+    border-radius: 9999px;
+    transition: width 0.12s ease;
+}
+
+.progress-bytes-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-align: right;
+    font-weight: 600;
+}
+
+.permission-alert-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+.permission-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.permission-text-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 2px;
+}
+
+.permission-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #eab308;
+}
+
+.permission-sub {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.btn-grant-permission {
+    padding: 6px 12px;
+    background: #eab308;
+    color: #1a1a1a;
+    font-weight: 800;
+    font-size: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition);
+}
+
+.btn-grant-permission:hover {
+    filter: brightness(1.1);
+}
+
+.update-action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-download-install {
+    flex: 1;
+    padding: 11px 16px;
+    background: var(--color-accent-blue);
+    border: none;
+    border-radius: 14px;
+    color: #FFFFFF;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(113, 152, 219, 0.35);
+    transition: all var(--transition);
+}
+
+.btn-download-install:hover {
+    background: var(--color-accent-dark);
+    transform: translateY(-1px);
+}
+
+.btn-download-install:active {
+    transform: scale(0.98);
+}
+
+.btn-cancel-download {
+    padding: 11px 16px;
+    background: var(--app-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 14px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-cancel-download:hover {
+    background: var(--surface-card);
+    color: var(--text-primary);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.spin-animation {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
