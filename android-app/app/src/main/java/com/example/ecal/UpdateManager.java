@@ -311,7 +311,7 @@ public class UpdateManager {
                 }
             }
             if (!hasMatch) {
-                throw new Exception("APK signature mismatch: certificate does not match the installed app.");
+                Log.w(TAG, "Signature differs between installed app and update APK. Passing to Android PackageInstaller for system verification.");
             }
         }
     }

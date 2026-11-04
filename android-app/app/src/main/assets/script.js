@@ -325,7 +325,7 @@ function getInstalledVersion() {
             console.warn("Could not retrieve version from AndroidUpdateBridge", e);
         }
     }
-    return "1.2.0";
+    return "1.2.1";
 }
 
 function updateInstalledVersionUI() {
