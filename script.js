@@ -1,205 +1,126 @@
 /**
- * Ecal: 2-Page Mobile Banking EMI Engine with Swipe Navigation
- * Features GitHub-Based Secure APK Update System, Cryptographic Verification & Policy
+ * Ecal: Smart EMI Calculator (Lightweight & Clean)
+ * Manual loan option selection calculation & GitHub updates
  */
+
+let selectedCategory = null;
 
 // ==========================================
 // 1. Core Financial Calculation Engine
 // ==========================================
 
-let currentCategory = '1';
+function selectLoanOption(type) {
+    selectedCategory = type;
 
-function getActiveCategory() {
-    const mobileRadio = document.getElementById("catMobile");
-    return (mobileRadio && mobileRadio.checked) ? '1' : '2';
-}
-
-function mobile() {
-    currentCategory = '1';
-    const a = parseFloat(document.getElementById("inp").value) || 0;
-    const b = parseFloat(document.getElementById("inp1").value) || 0;
-    const c = parseInt(document.getElementById("inp2").value) || 0;
-
-    const monthsDisplay = document.getElementById("inpMonths");
-    if (monthsDisplay) {
-        monthsDisplay.value = c;
-    }
-
-    const bal = a - b;
-    document.getElementById("inp3").value = bal.toFixed(2);
-
-    const inte = (bal * 3) / 100;
-    const inter = inte * c;
-    document.getElementById("inp4").value = inter.toFixed(2);
-
-    const d = inter + bal;
-    document.getElementById("inp5").value = d.toFixed(2);
-
-    const e = c > 0 ? (d / c) : 0;
-    document.getElementById("inp6").value = e.toFixed(2);
-
-    const f = (bal * 5) / 100;
-    const g = f + 100;
-    document.getElementById("inp7").value = g.toFixed(2);
-
-    updateCategoryUI('1');
-}
-
-function other() {
-    currentCategory = '2';
-    const a = parseFloat(document.getElementById("inp").value) || 0;
-    const b = parseFloat(document.getElementById("inp1").value) || 0;
-    const c = parseInt(document.getElementById("inp2").value) || 0;
-
-    const monthsDisplay = document.getElementById("inpMonths");
-    if (monthsDisplay) {
-        monthsDisplay.value = c;
-    }
-
-    const bal = a - b;
-    document.getElementById("inp3").value = bal.toFixed(2);
-
-    const inte = (bal * 2) / 100;
-    const inter = inte * c;
-    const h = (inter * 18) / 100;
-    const i = inter + h;
-    document.getElementById("inp4").value = i.toFixed(2);
-
-    const d = i + bal;
-    document.getElementById("inp5").value = d.toFixed(2);
-
-    const e = c > 0 ? (d / c) : 0;
-    document.getElementById("inp6").value = e.toFixed(2);
-
-    const f = (bal * 5) / 100;
-    const g = f + 100;
-    document.getElementById("inp7").value = g.toFixed(2);
-
-    updateCategoryUI('2');
-}
-
-function inst(value) {
-    if (value === '1' || value === 1) {
-        document.getElementById("catMobile").checked = true;
-        document.getElementById("catOther").checked = false;
-        mobile();
-    } else if (value === '2' || value === 2) {
-        document.getElementById("catOther").checked = true;
-        document.getElementById("catMobile").checked = false;
-        other();
-    }
-}
-
-function calculateCurrent() {
-    const cat = getActiveCategory();
-    inst(cat);
-}
-
-function updateCategoryUI(cat) {
+    const btnMobile = document.getElementById("btnActionMobile");
+    const btnOther = document.getElementById("btnActionOther");
+    const arrowMobile = document.getElementById("arrowMobile");
+    const arrowOther = document.getElementById("arrowOther");
     const chip = document.getElementById("activeCategoryChip");
-    const targetLabel = document.getElementById("toggleTargetLabel");
 
-    if (cat === '1') {
-        if (chip) chip.innerHTML = '<span>📱 Mobile</span>';
-        if (targetLabel) targetLabel.textContent = 'Other';
-    } else {
-        if (chip) chip.innerHTML = '<span>🛍️ Other</span>';
-        if (targetLabel) targetLabel.textContent = 'Mobile';
+    const a = parseFloat(document.getElementById("inp").value) || 0;
+    const b = parseFloat(document.getElementById("inp1").value) || 0;
+    const c = parseInt(document.getElementById("inp2").value) || 0;
+
+    const bal = a - b;
+    let inter = 0;
+    let total = 0;
+
+    if (type === '1') {
+        // Mobile: 3% monthly interest
+        if (btnMobile) btnMobile.classList.add("active");
+        if (btnOther) btnOther.classList.remove("active");
+        if (arrowMobile) arrowMobile.textContent = "✓";
+        if (arrowOther) arrowOther.textContent = "→";
+        if (chip) chip.innerHTML = "<span>Mobile</span>";
+
+        const inte = (bal * 3) / 100;
+        inter = inte * c;
+        total = inter + bal;
+
+    } else if (type === '2') {
+        // Other: 2% monthly interest + 18% GST on interest
+        if (btnOther) btnOther.classList.add("active");
+        if (btnMobile) btnMobile.classList.remove("active");
+        if (arrowOther) arrowOther.textContent = "✓";
+        if (arrowMobile) arrowMobile.textContent = "→";
+        if (chip) chip.innerHTML = "<span>Other</span>";
+
+        const inte = (bal * 2) / 100;
+        const baseInter = inte * c;
+        const gst = (baseInter * 18) / 100;
+        inter = baseInter + gst;
+        total = inter + bal;
     }
+
+    const emi = (c > 0 && total > 0) ? (total / c) : 0;
+    const fileCharge = bal > 0 ? ((bal * 5) / 100 + 100) : 0;
+
+    // Populate outputs
+    const inpMonths = document.getElementById("inpMonths");
+    const inp3 = document.getElementById("inp3");
+    const inp4 = document.getElementById("inp4");
+    const inp5 = document.getElementById("inp5");
+    const inp6 = document.getElementById("inp6");
+    const inp7 = document.getElementById("inp7");
+
+    if (inpMonths) inpMonths.value = c;
+    if (inp3) inp3.value = (bal >= 0 ? bal : 0).toFixed(2);
+    if (inp4) inp4.value = (inter >= 0 ? inter : 0).toFixed(2);
+    if (inp5) inp5.value = (total >= 0 ? total : 0).toFixed(2);
+    if (inp6) inp6.value = emi.toFixed(2);
+    if (inp7) inp7.value = fileCharge.toFixed(2);
 }
 
-function toggleResultCategory() {
-    const nextCat = currentCategory === '1' ? '2' : '1';
-    inst(nextCat);
+// Backward-compatible alias
+function inst(type) {
+    selectLoanOption(String(type));
+}
+
+function clearCategorySelection() {
+    selectedCategory = null;
+    const btnMobile = document.getElementById("btnActionMobile");
+    const btnOther = document.getElementById("btnActionOther");
+    const arrowMobile = document.getElementById("arrowMobile");
+    const arrowOther = document.getElementById("arrowOther");
+    const chip = document.getElementById("activeCategoryChip");
+
+    if (btnMobile) btnMobile.classList.remove("active");
+    if (btnOther) btnOther.classList.remove("active");
+    if (arrowMobile) arrowMobile.textContent = "→";
+    if (arrowOther) arrowOther.textContent = "→";
+    if (chip) chip.innerHTML = "<span>Select Loan Type</span>";
 }
 
 function resetForm() {
-    document.getElementById("emiForm").reset();
-    document.getElementById("catMobile").checked = true;
-    const monthsDisplay = document.getElementById("inpMonths");
-    if (monthsDisplay) monthsDisplay.value = '0';
-    document.getElementById("inp3").value = '0.00';
-    document.getElementById("inp4").value = '0.00';
-    document.getElementById("inp5").value = '0.00';
-    document.getElementById("inp6").value = '0.00';
-    document.getElementById("inp7").value = '0.00';
-    updateCategoryUI('1');
-    goToSlide(0);
+    const form = document.getElementById("emiForm");
+    if (form) form.reset();
+
+    const inpMonths = document.getElementById("inpMonths");
+    if (inpMonths) inpMonths.value = '0';
+
+    ['inp3', 'inp4', 'inp5', 'inp6', 'inp7'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '0.00';
+    });
+
+    clearCategorySelection();
 }
 
-// Reactive input changes
+// On input changes: DO NOT calculate. Remove active highlight so user selects option to compute.
 ['inp', 'inp1', 'inp2'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-        el.addEventListener('input', calculateCurrent);
+        el.addEventListener('input', () => {
+            if (selectedCategory) {
+                clearCategorySelection();
+            }
+        });
     }
 });
 
 // ==========================================
-// 2. Slider Navigation & Swipe Gestures
-// ==========================================
-
-let activeSlide = 0;
-const sliderTrack = document.getElementById("sliderTrack");
-const tabInputs = document.getElementById("tabInputs");
-const tabResults = document.getElementById("tabResults");
-const sliderViewport = document.getElementById("sliderViewport");
-
-function goToSlide(index) {
-    activeSlide = index;
-    if (sliderTrack) {
-        sliderTrack.style.transform = index === 0 ? 'translateX(0%)' : 'translateX(-50%)';
-    }
-
-    if (tabInputs && tabResults) {
-        tabInputs.classList.toggle('active', index === 0);
-        tabResults.classList.toggle('active', index === 1);
-    }
-
-    if (index === 1) {
-        calculateCurrent();
-    }
-}
-
-function selectCategoryAndSlide(cat) {
-    inst(cat);
-    goToSlide(1);
-}
-
-// Touch Swipe Detection
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-if (sliderViewport) {
-    sliderViewport.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-    }, { passive: true });
-
-    sliderViewport.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        handleSwipeGesture();
-    }, { passive: true });
-}
-
-function handleSwipeGesture() {
-    const diffX = touchEndX - touchStartX;
-    const diffY = touchEndY - touchStartY;
-
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
-        if (diffX < 0 && activeSlide === 0) {
-            goToSlide(1);
-        } else if (diffX > 0 && activeSlide === 1) {
-            goToSlide(0);
-        }
-    }
-}
-
-// ==========================================
-// 3. Theme Controller
+// 2. Theme Controller
 // ==========================================
 
 const THEME_KEY = 'ecal_theme_pref';
@@ -246,29 +167,19 @@ function initThemeListeners() {
 }
 
 // ==========================================
-// 4. Settings Menu, Security & Policy Modals
+// 3. Settings Menu & Policy Modals
 // ==========================================
 
 const btnSettingsTrigger = document.getElementById("btnSettingsTrigger");
-const btnCloseSettings = document.getElementById("btnCloseSettings");
 const settingsModalBackdrop = document.getElementById("settingsModalBackdrop");
+const btnCloseSettings = document.getElementById("btnCloseSettings");
 const settingsUpdateBadge = document.getElementById("settingsUpdateBadge");
-
-const preInstallBackdrop = document.getElementById("preInstallBackdrop");
-const btnConfirmInstall = document.getElementById("btnConfirmInstall");
-const btnCancelInstall = document.getElementById("btnCancelInstall");
-
-const policyModalBackdrop = document.getElementById("policyModalBackdrop");
-const btnOpenPolicy = document.getElementById("btnOpenPolicy");
-const btnClosePolicy = document.getElementById("btnClosePolicy");
 
 function openSettingsModal() {
     if (settingsModalBackdrop) {
         settingsModalBackdrop.classList.add("open");
         settingsModalBackdrop.setAttribute("aria-hidden", "false");
     }
-    updateInstalledVersionUI();
-    loadSecurityDetailsUI();
 }
 
 function closeSettingsModal() {
@@ -280,25 +191,49 @@ function closeSettingsModal() {
 
 if (btnSettingsTrigger) btnSettingsTrigger.addEventListener("click", openSettingsModal);
 if (btnCloseSettings) btnCloseSettings.addEventListener("click", closeSettingsModal);
+
 if (settingsModalBackdrop) {
     settingsModalBackdrop.addEventListener("click", (e) => {
-        if (e.target === settingsModalBackdrop) closeSettingsModal();
+        if (e.target === settingsModalBackdrop) {
+            closeSettingsModal();
+        }
     });
 }
 
+// Policy Modal
+const btnOpenPolicy = document.getElementById("btnOpenPolicy");
+const policyModalBackdrop = document.getElementById("policyModalBackdrop");
+const btnClosePolicy = document.getElementById("btnClosePolicy");
+
 if (btnOpenPolicy) {
     btnOpenPolicy.addEventListener("click", () => {
-        policyModalBackdrop.classList.remove("hidden");
+        if (policyModalBackdrop) {
+            policyModalBackdrop.classList.remove("hidden");
+            policyModalBackdrop.setAttribute("aria-hidden", "false");
+        }
     });
 }
+
 if (btnClosePolicy) {
     btnClosePolicy.addEventListener("click", () => {
-        policyModalBackdrop.classList.add("hidden");
+        if (policyModalBackdrop) {
+            policyModalBackdrop.classList.add("hidden");
+            policyModalBackdrop.setAttribute("aria-hidden", "true");
+        }
+    });
+}
+
+if (policyModalBackdrop) {
+    policyModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === policyModalBackdrop) {
+            policyModalBackdrop.classList.add("hidden");
+            policyModalBackdrop.setAttribute("aria-hidden", "true");
+        }
     });
 }
 
 // ==========================================
-// 5. GitHub-Based Secure APK Update System
+// 4. GitHub Release Update System
 // ==========================================
 
 const GITHUB_REPO = "Harrykalsi24/Ecal";
@@ -309,63 +244,72 @@ let selectedApkAsset = null;
 let expectedApkSha256 = null;
 let releaseManifestJson = null;
 let releaseManifestSig = null;
-let currentUpdateState = 'IDLE'; // IDLE, CHECKING, AVAILABLE, UP_TO_DATE, DOWNLOADING, READY_TO_INSTALL, PERMISSION_REQUIRED, INSTALLING
+let currentUpdateState = 'IDLE';
 
 const appInstalledVersionEl = document.getElementById("appInstalledVersion");
 const btnCheckUpdate = document.getElementById("btnCheckUpdate");
 const checkUpdateIcon = document.getElementById("checkUpdateIcon");
 const btnCheckUpdateText = document.getElementById("btnCheckUpdateText");
 const updateStatusMsg = document.getElementById("updateStatusMsg");
+
 const updateDetailsBox = document.getElementById("updateDetailsBox");
 const updateLatestTag = document.getElementById("updateLatestTag");
 const updateReleaseDate = document.getElementById("updateReleaseDate");
 const updateFileSize = document.getElementById("updateFileSize");
 const updateChangelog = document.getElementById("updateChangelog");
-const badgeSha256 = document.getElementById("badgeSha256");
-const badgeManifest = document.getElementById("badgeManifest");
+
 const downloadProgressWrap = document.getElementById("downloadProgressWrap");
 const downloadStatusLabel = document.getElementById("downloadStatusLabel");
 const downloadPercentLabel = document.getElementById("downloadPercentLabel");
 const downloadProgressBarFill = document.getElementById("downloadProgressBarFill");
 const downloadBytesLabel = document.getElementById("downloadBytesLabel");
+
 const permissionAlertBox = document.getElementById("permissionAlertBox");
 const btnGrantPermission = document.getElementById("btnGrantPermission");
 const btnDownloadInstall = document.getElementById("btnDownloadInstall");
 const btnDownloadText = document.getElementById("btnDownloadText");
 const btnCancelDownload = document.getElementById("btnCancelDownload");
 
+const preInstallBackdrop = document.getElementById("preInstallBackdrop");
+const btnConfirmInstall = document.getElementById("btnConfirmInstall");
+const btnCancelInstall = document.getElementById("btnCancelInstall");
+
 function getInstalledVersion() {
-    if (window.AndroidUpdateBridge && typeof window.AndroidUpdateBridge.getAppVersionName === 'function') {
+    if (window.AndroidUpdateBridge && typeof window.AndroidUpdateBridge.getInstalledVersionName === 'function') {
         try {
-            return window.AndroidUpdateBridge.getAppVersionName();
+            const v = window.AndroidUpdateBridge.getInstalledVersionName();
+            if (v && v.trim()) return v.trim();
         } catch (e) {
-            console.warn("Could not retrieve version from AndroidUpdateBridge", e);
+            console.warn("Could not read installed version", e);
         }
     }
-    return "1.3.0";
+    return "1.4.0";
 }
 
 function updateInstalledVersionUI() {
     const ver = getInstalledVersion();
     if (appInstalledVersionEl) {
-        appInstalledVersionEl.textContent = `v${ver.replace(/^v/i, '')}`;
+        appInstalledVersionEl.textContent = `v${ver}`;
     }
 }
 
-function parseSemVer(v) {
-    if (!v) return [0, 0, 0];
-    const clean = v.toString().replace(/^v/i, '').trim();
-    const parts = clean.split(/[-+]/)[0].split('.');
-    return parts.map(p => parseInt(p, 10) || 0);
+function normalizeVersion(versionStr) {
+    if (!versionStr) return [0];
+    return versionStr
+        .replace(/^v/i, '')
+        .split('-')[0]
+        .split('.')
+        .map(x => parseInt(x, 10) || 0);
 }
 
 function compareVersions(v1, v2) {
-    const a = parseSemVer(v1);
-    const b = parseSemVer(v2);
-    const maxLen = Math.max(a.length, b.length);
-    for (let i = 0; i < maxLen; i++) {
-        const num1 = a[i] || 0;
-        const num2 = b[i] || 0;
+    const p1 = normalizeVersion(v1);
+    const p2 = normalizeVersion(v2);
+    const len = Math.max(p1.length, p2.length);
+
+    for (let i = 0; i < len; i++) {
+        const num1 = p1[i] || 0;
+        const num2 = p2[i] || 0;
         if (num1 > num2) return 1;
         if (num1 < num2) return -1;
     }
@@ -376,29 +320,27 @@ function formatBytes(bytes) {
     if (!bytes || bytes <= 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + units[i];
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
 }
 
-function formatDate(isoString) {
-    if (!isoString) return '-';
+function formatDate(isoStr) {
+    if (!isoStr) return '';
     try {
-        const date = new Date(isoString);
-        return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-    } catch (e) {
-        return isoString;
+        const d = new Date(isoStr);
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch {
+        return isoStr;
     }
 }
 
 async function checkForUpdates(silent = false) {
-    if (currentUpdateState === 'CHECKING' || currentUpdateState === 'DOWNLOADING') {
-        return;
-    }
+    if (currentUpdateState === 'CHECKING' || currentUpdateState === 'DOWNLOADING') return;
 
     if (!silent) {
         currentUpdateState = 'CHECKING';
         btnCheckUpdate.disabled = true;
         if (checkUpdateIcon) checkUpdateIcon.classList.add("spin-animation");
-        btnCheckUpdateText.textContent = "Checking for updates...";
+        btnCheckUpdateText.textContent = "Checking...";
         updateStatusMsg.textContent = "Connecting to official GitHub Releases...";
         if (updateDetailsBox) updateDetailsBox.classList.add("hidden");
     }
@@ -408,7 +350,7 @@ async function checkForUpdates(silent = false) {
 
     try {
         if (!navigator.onLine) {
-            throw new Error("No internet connection available. Please check network.");
+            throw new Error("No internet connection available.");
         }
 
         const response = await fetch(GITHUB_API_URL, {
@@ -416,20 +358,20 @@ async function checkForUpdates(silent = false) {
         });
 
         if (response.status === 403 || response.status === 429) {
-            throw new Error("GitHub API rate limit reached. Please try again shortly.");
+            throw new Error("GitHub rate limit reached. Please try again later.");
         }
         if (response.status === 404) {
-            throw new Error("No published releases found for Ecal.");
+            throw new Error("No releases found.");
         }
         if (!response.ok) {
-            throw new Error(`GitHub API request failed (HTTP ${response.status}).`);
+            throw new Error(`GitHub check failed (HTTP ${response.status}).`);
         }
 
         const release = await response.json();
         latestReleaseData = release;
 
         const latestTag = release.tag_name || release.name || "";
-        if (!latestTag) throw new Error("Invalid GitHub release data received.");
+        if (!latestTag) throw new Error("Invalid release data received.");
 
         const assets = release.assets || [];
         const apkAsset = assets.find(a => 
@@ -438,11 +380,11 @@ async function checkForUpdates(silent = false) {
         );
 
         if (!apkAsset) {
-            throw new Error(`Release ${latestTag} found, but no APK asset is attached.`);
+            throw new Error(`Release ${latestTag} found, but no APK attached.`);
         }
         selectedApkAsset = apkAsset;
 
-        // Fetch SHA-256 and Signed Manifest assets if available
+        // Fetch verification checksum & manifest in background
         expectedApkSha256 = null;
         releaseManifestJson = null;
         releaseManifestSig = null;
@@ -456,7 +398,7 @@ async function checkForUpdates(silent = false) {
                     const match = txt.trim().match(/([a-fA-F0-9]{64})/);
                     if (match) expectedApkSha256 = match[1];
                 }
-            } catch (e) { console.warn("Could not fetch sha256 checksum asset", e); }
+            } catch (e) {}
         }
 
         const manifestAsset = assets.find(a => a.name === "release-manifest.json");
@@ -471,7 +413,7 @@ async function checkForUpdates(silent = false) {
                     releaseManifestJson = await mResp.text();
                     releaseManifestSig = await sigResp.text();
                 }
-            } catch (e) { console.warn("Could not fetch release manifest", e); }
+            } catch (e) {}
         }
 
         const cmp = compareVersions(latestTag, installedVer);
@@ -479,12 +421,12 @@ async function checkForUpdates(silent = false) {
         if (cmp > 0) {
             currentUpdateState = 'AVAILABLE';
             if (settingsUpdateBadge) settingsUpdateBadge.classList.remove("hidden");
-            updateStatusMsg.textContent = "New update available!";
-            renderUpdateDetails(release, apkAsset, installedVer);
+            updateStatusMsg.textContent = `New version available: ${latestTag}`;
+            renderUpdateDetails(release, apkAsset);
         } else {
             currentUpdateState = 'UP_TO_DATE';
             if (settingsUpdateBadge) settingsUpdateBadge.classList.add("hidden");
-            updateStatusMsg.textContent = "You're using the latest verified version.";
+            updateStatusMsg.textContent = `Your app is up to date (v${installedVer}).`;
             if (updateDetailsBox) updateDetailsBox.classList.add("hidden");
         }
 
@@ -503,22 +445,14 @@ async function checkForUpdates(silent = false) {
     }
 }
 
-function renderUpdateDetails(release, asset, installedVer) {
+function renderUpdateDetails(release, asset) {
     if (!updateDetailsBox) return;
 
     updateDetailsBox.classList.remove("hidden");
     if (updateLatestTag) updateLatestTag.textContent = release.tag_name || release.name;
     if (updateReleaseDate) updateReleaseDate.textContent = formatDate(release.published_at);
     if (updateFileSize) updateFileSize.textContent = formatBytes(asset.size);
-    if (updateChangelog) updateChangelog.textContent = release.body || "No release notes provided.";
-
-    // Security badges
-    if (badgeSha256) {
-        badgeSha256.textContent = expectedApkSha256 ? "🔒 Verified SHA-256" : "🔒 SHA-256 Verified";
-    }
-    if (badgeManifest) {
-        badgeManifest.style.display = releaseManifestJson ? "inline-block" : "none";
-    }
+    if (updateChangelog) updateChangelog.textContent = release.body || "Official release updates & improvements.";
 
     if (downloadProgressWrap) downloadProgressWrap.classList.add("hidden");
     if (permissionAlertBox) permissionAlertBox.classList.add("hidden");
@@ -533,7 +467,6 @@ function startDownloadAndInstall() {
     if (!selectedApkAsset) return;
 
     if (currentUpdateState === 'READY_TO_INSTALL') {
-        // Show Pre-Installation Informational Modal before opening Android installer
         if (preInstallBackdrop) {
             preInstallBackdrop.classList.remove("hidden");
         }
@@ -613,7 +546,6 @@ window.onUpdateStatus = function(state, message) {
             btnDownloadText.textContent = "Install Update";
             btnDownloadInstall.disabled = false;
         }
-        // Show the transparent pre-installation informational dialog
         if (preInstallBackdrop) {
             preInstallBackdrop.classList.remove("hidden");
         }
@@ -672,76 +604,6 @@ window.onInstallPermissionResult = function(granted) {
     }
 };
 
-// ==========================================
-// 6. App Security & Verification Logic
-// ==========================================
-
-function loadSecurityDetailsUI() {
-    const secPkg = document.getElementById("secPackageName");
-    const secVer = document.getElementById("secVersion");
-    const secSource = document.getElementById("secInstallSource");
-    const secCert = document.getElementById("secCertFingerprint");
-    const secSha = document.getElementById("secApkSha256");
-
-    if (window.AndroidUpdateBridge && typeof window.AndroidUpdateBridge.getAppSecurityDetails === 'function') {
-        try {
-            const raw = window.AndroidUpdateBridge.getAppSecurityDetails();
-            const data = JSON.parse(raw);
-            if (secPkg) secPkg.textContent = data.packageName || "com.example.ecal";
-            if (secVer) secVer.textContent = `${data.versionName} (Code ${data.versionCode})`;
-            if (secSource) secSource.textContent = data.installSource || "Direct APK (GitHub Release)";
-            if (secCert) secCert.textContent = data.certFingerprint || "Loading...";
-            if (secSha) secSha.textContent = data.apkSha256 ? `${data.apkSha256.substring(0, 32)}...` : "Self-contained Web Container";
-        } catch (e) {
-            console.warn("Could not load security details", e);
-        }
-    } else {
-        if (secPkg) secPkg.textContent = "com.example.ecal";
-        if (secVer) secVer.textContent = "1.3.0 (Code 5)";
-        if (secSource) secSource.textContent = "Web Browser / Standalone";
-        if (secCert) secCert.textContent = "61:CF:E6:6E:2E:22:43:59:E7:1F:7D:68:89:FD:AC:E2:F9:8A:BE:C5";
-        if (secSha) secSha.textContent = "Verified Web Source";
-    }
-}
-
-const btnVerifyIntegrity = document.getElementById("btnVerifyIntegrity");
-const integrityResultBox = document.getElementById("integrityResultBox");
-const integrityStatusPill = document.getElementById("integrityStatusPill");
-const integrityStatusDesc = document.getElementById("integrityStatusDesc");
-
-if (btnVerifyIntegrity) {
-    btnVerifyIntegrity.addEventListener("click", () => {
-        integrityResultBox.classList.remove("hidden");
-        if (window.AndroidUpdateBridge && typeof window.AndroidUpdateBridge.verifyAppIntegrity === 'function') {
-            try {
-                const raw = window.AndroidUpdateBridge.verifyAppIntegrity();
-                const res = JSON.parse(raw);
-                if (res.status === 'VERIFIED') {
-                    integrityStatusPill.className = "integrity-status-pill verified";
-                    integrityStatusPill.textContent = "App integrity verified ✓";
-                    integrityStatusDesc.textContent = res.message || "Package identity and signatures verified.";
-                } else if (res.status === 'FAILED') {
-                    integrityStatusPill.className = "integrity-status-pill failed";
-                    integrityStatusPill.textContent = "Verification failed ✗";
-                    integrityStatusDesc.textContent = res.message || "Integrity verification check failed.";
-                } else {
-                    integrityStatusPill.className = "integrity-status-pill unavailable";
-                    integrityStatusPill.textContent = "Verification unavailable";
-                    integrityStatusDesc.textContent = res.message || "Integrity status could not be computed.";
-                }
-            } catch (e) {
-                integrityStatusPill.className = "integrity-status-pill unavailable";
-                integrityStatusPill.textContent = "Verification error";
-                integrityStatusDesc.textContent = e.message;
-            }
-        } else {
-            integrityStatusPill.className = "integrity-status-pill verified";
-            integrityStatusPill.textContent = "App integrity verified ✓";
-            integrityStatusDesc.textContent = "Official client distribution verified.";
-        }
-    });
-}
-
 // Event Listeners
 if (btnCheckUpdate) btnCheckUpdate.addEventListener("click", () => checkForUpdates(false));
 if (btnDownloadInstall) btnDownloadInstall.addEventListener("click", startDownloadAndInstall);
@@ -758,11 +620,9 @@ if (btnGrantPermission) {
 initThemeListeners();
 const initialTheme = getSavedTheme();
 applyTheme(initialTheme);
-goToSlide(0);
-calculateCurrent();
 updateInstalledVersionUI();
 
-// Auto-check for updates silently on app startup (BitChord feature)
+// Auto-check for updates silently on app startup
 setTimeout(() => {
     checkForUpdates(true);
 }, 1200);
