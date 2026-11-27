@@ -283,7 +283,7 @@ function getInstalledVersion() {
             console.warn("Could not read installed version", e);
         }
     }
-    return "1.4.0";
+    return "1.4.1";
 }
 
 function updateInstalledVersionUI() {

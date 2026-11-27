@@ -313,7 +313,7 @@ input[type=number] {
 /* Category Action Buttons Section */
 .category-action-section {
     margin-top: 0.25rem;
-    margin-bottom: 2.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .section-label {
@@ -399,18 +399,22 @@ input[type=number] {
     color: var(--text-muted);
 }
 
-.swipe-hint {
-    text-align: center;
-    margin-top: 1.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    opacity: 0.85;
+.active-category-chip {
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-    padding: 0.4rem 0.8rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(113, 152, 219, 0.2);
+.active-category-chip span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.02em;
 }
 
 /* Hero Bank Card */
@@ -422,8 +426,8 @@ input[type=number] {
     position: relative;
     overflow: hidden;
     box-shadow: var(--hero-card-shadow);
-    margin-top: 0.75rem;
-    margin-bottom: 1.15rem;
+    margin-top: 0;
+    margin-bottom: 0;
     display: flex;
     flex-direction: column;
     min-height: 160px;
@@ -1341,7 +1345,7 @@ input[type=number] {
 }
 
 .results-container {
-    margin-top: 2rem;
+    margin-top: 0;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
